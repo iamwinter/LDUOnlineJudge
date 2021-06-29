@@ -273,23 +273,23 @@ CREATE TABLE `users`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `group_contests`;
 CREATE TABLE `group_contests`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号 主键id',
-  `contest_id` int(11) NOT NULL COMMENT '比赛编号 比赛的编号',
-  `group_id` int(11) NOT NULL COMMENT '班级编号 班级的编号',
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `contest_id` int(11) NOT NULL COMMENT '比赛ID',
+  `group_id` int(11) NOT NULL COMMENT '班级ID',
   `order` int(11) NOT NULL DEFAULT 0 COMMENT '排序 contest排序',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间 默认为当前时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改日期 默认为当前时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `cid`(`contest_id`) USING BTREE,
   INDEX `gid`(`group_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '班级_赛事表 班级内包含的比赛id' ROW_FORMAT = Fixed;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Fixed;
 
 -- ----------------------------
 -- Table structure for group_users
 -- ----------------------------
 DROP TABLE IF EXISTS `group_users`;
 CREATE TABLE `group_users`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `group_id` int(11) NOT NULL COMMENT '班级编号',
   `user_id` int(11) NOT NULL COMMENT '成员编号',
   `status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0:申请加入/审核中; 1:拒绝加入; 2:通过申请; 3:创建者邀入',
@@ -306,15 +306,15 @@ CREATE TABLE `group_users`  (
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups`  (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '班级名称 e.g 算法设计',
-  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '注释说明',
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '班级名称 e.g 算法设计',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '注释说明',
   `creator` int(11) NOT NULL COMMENT '创建人编号 当前用户ID',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建日期 默认为当前时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改日期 默认为当前日期',
-  `teacher` varchar(32) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '负责人名称 班级负责人姓名',
+  `teacher` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '教师姓名',
   `hidden` tinyint(4) NULL DEFAULT 0 COMMENT '锁定状态 是否隐藏',
   `grade` int(11) NULL DEFAULT NULL COMMENT '年级 整数e.g.2016',
-  `subject` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '专业名称 e.g 软件工程',
+  `major` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '专业名称 e.g 软件工程',
   `class` int(11) NULL DEFAULT NULL COMMENT '班级编号 e.g 01',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `IDX_groups_creator`(`creator`) USING BTREE
