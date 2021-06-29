@@ -10,7 +10,7 @@ apt-get update && apt-get -y upgrade
 apt-get -y install software-properties-common
 echo -e "\n" | apt-add-repository ppa:ondrej/php
 apt-get update
-apt-get -y install php7.2 php7.2-fpm php7.2-mysql php7.2-xml
+apt-get -y install php7.2 php7.2-fpm php7.2-mysql php7.2-xml php7.2-mbstring
 service php7.2-fpm start
 
 # composer
