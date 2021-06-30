@@ -30,7 +30,8 @@ function uploadBig(obj) {
             processData: false,
             contentType: false,
             success:function(ret){
-                if(index===args.files.length-1 && start+args.blockSize>=args.files[index].size)//最后一个上传完毕
+                // 只有ret返回0，才代表文件需要继续上传
+                if(ret!==0 || index===args.files.length-1 && start+args.blockSize>=args.files[index].size)//最后一个上传完毕
                 {
                     //上传成功...回调函数[文件总数，控制器返回值]
                     if(args.success!==undefined)

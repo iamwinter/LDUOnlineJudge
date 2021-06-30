@@ -42,7 +42,7 @@
                         <td nowrap>{{$item->nick}}</td>
                         <td nowrap>{{$item->authority}}</td>
                         <td nowrap>{{$item->created_at}}</td>
-                        <td><a @if($item->creator)href="{{route('user',$item->creator)}}"@endif>{{$item->creator}}</a></td>
+                        <td><a @if($item->creator)href="{{route('user',$item->creator)}}"@endif target="_blank">{{$item->creator}}</a></td>
                         <td>
                             @if($item->username!='admin'||$item->authority!='admin')
                                 <a href="javascript:delete_privilege({{$item->id}})" class="px-1" title="删除">

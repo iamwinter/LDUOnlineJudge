@@ -37,70 +37,43 @@
                 </a>
 
                 <div class="row">
-                    <div class="col-12 col-md-6 px-2">
-                        <table class="table table-striped table-hover table-sm">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th>文件名</th>
-                                <th>大小</th>
-                                <th>操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach(array_slice($tests,0,(count($tests)+1)>>1) as $item)
+                    {{-- 把所有数据文件分为两部分，然后左右分栏显示 --}}
+                    @php($tests_parts=[array_slice($tests,0,(count($tests)+1)>>1),array_slice($tests,(count($tests)+1)>>1)])
+                    @for($part=0;$part<2;$part++)
+                        <div class="col-12 col-md-6 px-2">
+                            <table class="table table-striped table-hover table-sm">
+                                <thead>
                                 <tr>
-                                    <td onclick="var cb=$(this).find('input[type=checkbox]');cb.prop('checked',!cb.prop('checked'))">
-                                        <input type="checkbox" value="{{$item['filename']}}" onclick="window.event.stopPropagation();" style="vertical-align:middle;zoom: 140%">
-                                    </td>
-                                    <td nowrap>
-                                        <a href="javascript:" onclick="get_data('{{$item['filename']}}')" data-toggle="modal" data-target="#myModal">
-                                            {{$item['filename']}}
-                                        </a>
-                                    </td>
-                                    <td nowrap>{{$item['size']}}B</td>
-                                    <td nowrap>
-                                        <a href="javascript:delete_data('{{$item['filename']}}')" class="px-1">
-                                            <i class="fa fa-trash" aria-hidden="true"> 删除</i>
-                                        </a>
-                                    </td>
+                                    <th></th>
+                                    <th>文件名</th>
+                                    <th>大小</th>
+                                    <th>操作</th>
                                 </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-12 col-md-6 px-2">
-                        <table class="table table-striped table-hover table-sm">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th>文件名</th>
-                                <th>大小</th>
-                                <th>操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach(array_slice($tests,(count($tests)+1)>>1) as $item)
-                                <tr>
-                                    <td onclick="var cb=$(this).find('input[type=checkbox]');cb.prop('checked',!cb.prop('checked'))">
-                                        <input type="checkbox" value="{{$item['filename']}}" onclick="window.event.stopPropagation();" style="vertical-align:middle;zoom: 140%">
-                                    </td>
-                                    <td nowrap>
-                                        <a href="javascript:" onclick="get_data('{{$item['filename']}}')" data-toggle="modal" data-target="#myModal">
-                                            {{$item['filename']}}
-                                        </a>
-                                    </td>
-                                    <td nowrap>{{$item['size']}}B</td>
-                                    <td nowrap>
-                                        <a href="javascript:delete_data('{{$item['filename']}}')" class="px-1">
-                                            <i class="fa fa-trash" aria-hidden="true"> 删除</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                @foreach($tests_parts[$part] as $item)
+                                    <tr>
+                                        <td onclick="var cb=$(this).find('input[type=checkbox]');cb.prop('checked',!cb.prop('checked'))">
+                                            <input type="checkbox" value="{{$item['filename']}}" onclick="window.event.stopPropagation();" style="vertical-align:middle;zoom: 140%">
+                                        </td>
+                                        <td nowrap>
+                                            <a href="javascript:" onclick="get_data('{{$item['filename']}}')" {{-- data-toggle="modal" data-target="#myModal"--}} >
+                                                {{$item['filename']}}
+                                            </a>
+                                        </td>
+                                        <td nowrap>{{$item['size']}}B</td>
+                                        <td nowrap>
+                                            <a href="javascript:delete_data('{{$item['filename']}}')" class="px-1">
+                                                <i class="fa fa-trash" aria-hidden="true"> 删除</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endfor
+
                 </div>
 
             </div>
@@ -144,7 +117,7 @@
         </div>
     </div>
 
-    <script src="{{asset('js/uploadBig.js')}}"></script>
+    <script src="{{asset('js/uploadBig.js')}}?v=2"></script>
     <script>
         function do_upload() {
             uploadBig({
@@ -164,7 +137,11 @@
                 },
                 success:function (file_count,ret) {
                     Notiflix.Loading.Remove();
-                    Notiflix.Report.Success('成功', '已导入'+file_count+'个文件','好的',function () {location.reload()});
+                    if(ret<0) {
+                        Notiflix.Report.Failure('上传失败', '您不是题目的创建者，也不是最高管理员，没有权限上传数据！', '好的');
+                    }else{
+                        Notiflix.Report.Success('上传成功', '已导入'+file_count+'个文件','好的',function () {location.reload()});
+                    }
                 },
                 error:function (xhr,status,err) {
                     Notiflix.Loading.Remove();
@@ -185,10 +162,15 @@
                     'filename':filename,
                 },
                 function (ret) {
-                    ret=JSON.parse(ret);
-                    $("#file_name").html(filename);
-                    $("input[name=filename]").val(filename);
-                    $("#content").val(ret)
+                    if(ret<0) {
+                        Notiflix.Notify.Failure('您不是题目的创建者，也不是最高管理员，没有权限查看数据！');
+                    }else {
+                        $('#myModal').modal('show');
+                        ret = JSON.parse(ret);
+                        $("#file_name").html(filename);
+                        $("input[name=filename]").val(filename);
+                        $("#content").val(ret)
+                    }
                 }
             );
         }
@@ -208,7 +190,10 @@
                         'fnames':fnames,
                     },
                     function (ret) {
-                        location.reload();
+                        if(ret<0)
+                            Notiflix.Report.Failure('删除失败','您不是题目的创建者，也不是最高管理员，没有权限删除数据！','好的');
+                        else
+                            location.reload();
                     }
                 );
             });

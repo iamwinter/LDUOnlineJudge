@@ -15,9 +15,10 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+// 用户认证模块，包括登录注册等
 Auth::routes();
 
-// Client
+// Client 用户前台各个页面
 Route::get('/', 'Client\HomeController@index')->name('home');
 Route::get('/home', 'Client\HomeController@index');
 Route::post('/get_notice','Client\HomeController@get_notice')->name('get_notice');
@@ -45,7 +46,7 @@ Route::middleware(['auth','CheckBlacklist'])->where(['id'=>'[0-9]+'])->group(fun
 
 });
 
-//    讨论
+//  题目页面讨论板模块
 Route::post('/load_discussion', 'Client\ProblemController@load_discussion')->name('load_discussion');
 Route::middleware(['auth','CheckBlacklist'])->group(function () {
     Route::post('/edit_discussion/{pid}', 'Client\ProblemController@edit_discussion')->name('edit_discussion');
@@ -57,7 +58,7 @@ Route::middleware(['auth','CheckBlacklist','Privilege:problem_tag'])->group(func
 });
 
 
-// Contest
+// Contest，用户前台竞赛页面所有路由
 Route::prefix('contest/{id}')->name('contest.')->where(['id'=>'[0-9]+'])->where(['pid'=>'[0-9]+'])->group(function () {
 
     Route::middleware(['auth','CheckContest','CheckBlacklist'])->group(function (){
@@ -83,9 +84,10 @@ Route::prefix('contest/{id}')->name('contest.')->where(['id'=>'[0-9]+'])->where(
 });
 
 
-// Administration
+// Administration 管理员后台页面所有路由
 Route::middleware(['auth','CheckBlacklist'])->prefix('admin')->name('admin.')->where(['id'=>'[0-9]+'])->group(function () {
     Route::get('/', 'Admin\HomeController@index')->name('home');
+
 //    判题端指令
     Route::post('/cmd_polling', 'Admin\HomeController@cmd_polling')->middleware(['Privilege:admin'])->name('cmd_polling');
 
@@ -117,14 +119,7 @@ Route::middleware(['auth','CheckBlacklist'])->prefix('admin')->name('admin.')->w
     Route::middleware(['Privilege:problem_list'])->prefix('problem')->name('problem.')->group(function (){
         Route::get('/list', 'Admin\ProblemController@list')->name('list');
     });
-    //   manage problem tag
-    Route::middleware(['Privilege:problem_tag'])->prefix('problem')->name('problem.')->group(function (){
-        Route::get('/tags', 'Admin\ProblemController@tags')->name('tags');
-        Route::post('/tag_delete', 'Admin\ProblemController@tag_delete')->name('tag_delete');
-        Route::get('/tag_pool', 'Admin\ProblemController@tag_pool')->name('tag_pool');
-        Route::post('/tag_pool_delete', 'Admin\ProblemController@tag_pool_delete')->name('tag_pool_delete');
-        Route::post('/tag_pool_hidden', 'Admin\ProblemController@tag_pool_hidden')->name('tag_pool_hidden');
-    });
+
 //   manage problem editor
     Route::middleware(['Privilege:edit_problem'])->prefix('problem')->name('problem.')->group(function (){
         Route::any('/add','Admin\ProblemController@add')->name('add');
@@ -133,6 +128,16 @@ Route::middleware(['auth','CheckBlacklist'])->prefix('admin')->name('admin.')->w
         Route::post('/update/hidden','Admin\ProblemController@update_hidden')->name('update_hidden');
         Route::get('/get_spj/{pid}','Admin\ProblemController@get_spj')->name('get_spj');
     });
+
+//   manage problem tag
+    Route::middleware(['Privilege:problem_tag'])->prefix('problem')->name('problem.')->group(function (){
+        Route::get('/tags', 'Admin\ProblemController@tags')->name('tags');
+        Route::post('/tag_delete', 'Admin\ProblemController@tag_delete')->name('tag_delete');
+        Route::get('/tag_pool', 'Admin\ProblemController@tag_pool')->name('tag_pool');
+        Route::post('/tag_pool_delete', 'Admin\ProblemController@tag_pool_delete')->name('tag_pool_delete');
+        Route::post('/tag_pool_hidden', 'Admin\ProblemController@tag_pool_hidden')->name('tag_pool_hidden');
+    });
+
 //   manage problem data
     Route::middleware(['Privilege:problem_data'])->prefix('problem')->name('problem.')->group(function (){
         Route::get('/test_data','Admin\ProblemController@test_data')->name('test_data');
@@ -141,12 +146,14 @@ Route::middleware(['auth','CheckBlacklist'])->prefix('admin')->name('admin.')->w
         Route::post('/update/data','Admin\ProblemController@update_data')->name('update_data');
         Route::post('/delete/data','Admin\ProblemController@delete_data')->name('delete_data');
     });
+
 //   manage problem rejudge
-    Route::middleware(['Privilege:problem_rejudge'])->prefix('problem')->name('problem.')->group(function (){
+    Route::middleware(['Privilege:admin'])->prefix('problem')->name('problem.')->group(function (){
         Route::any('/rejudge','Admin\ProblemController@rejudge')->name('rejudge');
     });
+
 //   manage problem import export
-    Route::middleware(['Privilege:import_export_problem'])->prefix('problem')->name('problem.')->group(function (){
+    Route::middleware(['Privilege:admin'])->prefix('problem')->name('problem.')->group(function (){
         Route::get('/import_export','Admin\ProblemController@import_export')->name('import_export');
         Route::any('/import','Admin\ProblemController@import')->name('import');
         Route::any('/export','Admin\ProblemController@export')->name('export');

@@ -38,7 +38,7 @@
                         <td nowrap><a href="{{route('user',$item->username)}}" target="_blank">{{$item->username}}</a></td>
                         <td nowrap>{{$item->nick}}</td>
                         <td nowrap>{{$item->created_at}}</td>
-                        <td><a @if($item->creator)href="{{route('user',$item->creator)}}"@endif>{{$item->creator}}</a></td>
+                        <td><a @if($item->creator)href="{{route('user',$item->creator)}}"@endif target="_blank">{{$item->creator}}</a></td>
                         <td>
                             <a href="javascript:delete_black({{$item->id}})" class="px-1" title="删除">
                                 <i class="fa fa-trash" aria-hidden="true"></i>

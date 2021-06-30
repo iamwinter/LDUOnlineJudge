@@ -78,7 +78,8 @@
                 <th>特判</th>
                 <th>解决/提交</th>
                 <th>创建时间</th>
-                <th>隐藏</th>
+                <th>创建人</th>
+                <th>当前状态</th>
                 <th>操作</th>
             </tr>
             </thead>
@@ -95,6 +96,7 @@
                     <td nowrap>{{$item->spj?'特判':'否'}}</td>
                     <td nowrap>{{$item->solved}} / {{$item->submit}}</td>
                     <td nowrap>{{$item->created_at}}</td>
+                    <td><a @if($item->creator)href="{{route('user',$item->creator)}}"@endif target="_blank">{{$item->creator}}</a></td>
                     <td nowrap>
                         <a href="javascript:" onclick="update_hidden('{{1-$item->hidden}}',{{$item->id}});"
                             class="px-1" title="点击切换">{{$item->hidden?'隐藏*不可见':'公开'}}</a>
@@ -133,11 +135,15 @@
                 function (ret) {
                     if(id===-1){
                         Notiflix.Report.Init();
-                        Notiflix.Report.Success('操作成功','已更新'+ret+'条数据!','confirm',function () {
+                        Notiflix.Report.Success('操作成功','成功更新'+ret+'条数据！注意：非最高管理员只能修改自己创建的题目。','confirm',function () {
                             location.reload();
                         })
                     }else{
-                        location.reload();
+                        if(ret==0) {
+                            Notiflix.Notify.Failure('只有最高管理员或该题目的创建者可以修改！')
+                            $('td input[type=checkbox]').prop('checked',false)
+                        }else
+                            location.reload();
                     }
                 }
             );

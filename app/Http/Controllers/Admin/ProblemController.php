@@ -12,14 +12,17 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Console\Input\Input;
 
 use App\Http\Controllers\UploadController;
+use const http\Client\Curl\AUTH_ANY;
 
 class ProblemController extends Controller
 {
     //管理员显示题目列表
     public function list(){
-        $problems=DB::table('problems')->select('id','title','type','source','spj','created_at','hidden',
-            DB::raw("(select count(id) from solutions where problem_id=problems.id) as submit"),
-            DB::raw("(select count(id) from solutions where problem_id=problems.id and result=4) as  solved")
+        $problems=DB::table('problems')
+            ->leftJoin('users','creator','=','users.id')
+            ->select('problems.id','title','type','source','spj','problems.created_at','hidden','username as creator',
+                DB::raw("(select count(id) from solutions where problem_id=problems.id) as submit"),
+                DB::raw("(select count(id) from solutions where problem_id=problems.id and result=4) as  solved")
             )
             ->when(isset($_GET['pid'])&&$_GET['pid']!='',function ($q){return $q->where('id',$_GET['pid']);})
             ->when(isset($_GET['title'])&&$_GET['title']!='',function ($q){return $q->where('title','like','%'.$_GET['title'].'%');})
@@ -28,6 +31,98 @@ class ProblemController extends Controller
             ->paginate(isset($_GET['perPage'])?$_GET['perPage']:100);
         return view('admin.problem.list',compact('problems'));
     }
+
+    //管理员添加题目
+    public function add(Request $request){
+        //提供加题界面
+        if($request->isMethod('get')){
+            $pageTitle='添加题目';
+            return view('admin.problem.edit',compact('pageTitle'));
+        }
+        //提交一条新题目
+        if($request->isMethod('post')){
+            $pid=DB::table('problems')->insertGetId(['creator'=>Auth::id()]);
+            return $this->update($request,$pid);
+        }
+    }
+
+    //管理员修改题目
+    public function update(Request $request,$id=-1)
+    {
+        //get提供修改界面
+        if ($request->isMethod('get')) {
+
+            $pageTitle='修改题目';
+            if($id==-1) {
+                if(isset($_GET['id']))//用户手动输入了题号
+                    return redirect(route('admin.problem.update_withId',$_GET['id']));
+                return view('admin.problem.edit',compact('pageTitle'))->with('lack_id',true);
+            } //询问要修改的题号
+
+            $problem=DB::table('problems')->find($id);  // 提取出要修改的题目
+            if($problem==null)
+                return view('admin.fail',['msg'=>'该题目不存在或操作有误!']);
+            if(!Auth::user()->privilege('admin') && Auth::id()!=$problem->creator) //不是超级管理员 && 不是出题人 => 禁止修改本题
+                return view('admin.fail',['msg'=>'您不是该题目的创建者，也不是最高管理员，没有权限修改本题!']);
+
+            $samples=read_problem_data($problem->id);
+            //看看有没有特判文件
+            $spj_exist=Storage::exists('data/'.$problem->id.'/spj/spj.cpp');
+            return view('admin.problem.edit',compact('pageTitle','problem','samples','spj_exist'));
+        }
+
+        // 提交修改好的题目
+        if($request->isMethod('post')){
+            $problem=$request->input('problem');
+            if(!isset($problem['spj'])) // 默认不特判
+                $problem['spj']=0;
+
+            $update_ret = DB::table('problems')
+                ->where('id',$id)
+                ->when(!Auth::user()->privilege('admin'), function ($q){return $q->where('creator', Auth::id());})
+                ->update($problem);
+            if(!$update_ret)
+                return view('admin.fail',['msg'=>'您不是该题目的创建者，也不是最高管理员，没有权限修改本题!']);
+
+            ///保存样例、spj
+            $samp_ins =$request->input('sample_ins');
+            $samp_outs=$request->input('sample_outs');
+            save_problem_data($id,(array)$samp_ins,(array)$samp_outs,true,true); //保存样例
+
+            $msg=sprintf('题目<a href="%s" target="_blank">%d</a>修改成功！ <a href="%s">上传测试数据</a>',
+                route('problem',$id),$id,route('admin.problem.test_data','pid='.$id));
+
+            $spjFile=$request->file('spj_file');
+            if($spjFile!=null && $spjFile->isValid()) {
+                $spj_compile=save_problem_spj($id, autoiconv(file_get_contents($spjFile)));
+                if($spj_compile)
+                    $msg.='<br>[ spj.cpp compilation ]:<br>'.$spj_compile;
+                else
+                    $msg.='<br>[ spj.cpp compiled successfully ]';
+            } //保存spj
+            return view('admin.success',['msg'=>$msg]);
+        }
+    }
+
+    public function get_spj($pid){
+        header('Content-type: text/plain; charset=UTF-8');
+        header("Content-Disposition:attachement;filename=spj".$pid.".cpp");//提示下载
+        return get_spj_code($pid);
+    }
+
+    //管理员修改题目状态  0密封 or 1公开
+    public function update_hidden(Request $request){
+        if($request->ajax()){
+            $pids=$request->input('pids')?:[];
+            $hidden=$request->input('hidden');
+            return DB::table('problems')
+                ->whereIn('id',$pids)
+                ->when(!Auth::user()->privilege('admin'), function ($q){return $q->where('creator', Auth::id());})
+                ->update(['hidden'=>$hidden]);
+        }
+        return 0;
+    }
+
 
     //管理标签
     public function tags(){
@@ -66,83 +161,6 @@ class ProblemController extends Controller
         return DB::table('tag_pool')->whereIn('id',$tids)->update(['hidden'=>$hidden]);
     }
 
-    //管理员添加题目
-    public function add(Request $request){
-        //提供加题界面
-        if($request->isMethod('get')){
-            $pageTitle='添加题目';
-            return view('admin.problem.edit',compact('pageTitle'));
-        }
-        //提交一条新题目
-        if($request->isMethod('post')){
-            $pid=DB::table('problems')->insertGetId([]);
-            return $this->update($request,$pid);
-        }
-    }
-
-    //管理员修改题目
-    public function update(Request $request,$id=-1)
-    {
-        //get提供修改界面
-        if ($request->isMethod('get')) {
-
-            $pageTitle='修改题目';
-            if($id==-1) {
-                if(isset($_GET['id']))//用户手动输入了题号
-                    return redirect(route('admin.problem.update_withId',$_GET['id']));
-                return view('admin.problem.edit',compact('pageTitle'))->with('lack_id',true);
-            } //询问要修改的题号
-            $problem=DB::table('problems')->find($id);
-            if($problem==null)
-                return view('admin.fail',['msg'=>'该题目不存在或操作有误!']);
-
-            $samples=read_problem_data($problem->id);
-            //看看有没有特判文件
-            $spj_exist=Storage::exists('data/'.$problem->id.'/spj/spj.cpp');
-            return view('admin.problem.edit',compact('pageTitle','problem','samples','spj_exist'));
-        }
-
-        // 提交修改好的题目
-        if($request->isMethod('post')){
-            $problem=$request->input('problem');
-            if(!isset($problem['spj'])) $problem['spj']=0;
-            DB::table('problems')->where('id',$id)->update($problem);
-            ///保存样例、spj
-            $samp_ins =$request->input('sample_ins');
-            $samp_outs=$request->input('sample_outs');
-            save_problem_data($id,(array)$samp_ins,(array)$samp_outs,true,true); //保存样例
-
-            $msg=sprintf('题目<a href="%s" target="_blank">%d</a>修改成功！ <a href="%s">上传测试数据</a>',
-                route('problem',$id),$id,route('admin.problem.test_data','pid='.$id));
-
-            $spjFile=$request->file('spj_file');
-            if($spjFile!=null && $spjFile->isValid()) {
-                $spj_compile=save_problem_spj($id, autoiconv(file_get_contents($spjFile)));
-                if($spj_compile)
-                    $msg.='<br>[ spj.cpp compilation ]:<br>'.$spj_compile;
-                else
-                    $msg.='<br>[ spj.cpp compiled successfully ]';
-            } //保存spj
-            return view('admin.success',['msg'=>$msg]);
-        }
-    }
-
-    public function get_spj($pid){
-        header('Content-type: text/plain; charset=UTF-8');
-        header("Content-Disposition:attachement;filename=spj".$pid.".cpp");//提示下载
-        return get_spj_code($pid);
-    }
-
-    //管理员修改题目状态  0密封 or 1公开
-    public function update_hidden(Request $request){
-        if($request->ajax()){
-            $pids=$request->input('pids')?:[];
-            $hidden=$request->input('hidden');
-            return DB::table('problems')->whereIn('id',$pids)->update(['hidden'=>$hidden]);
-        }
-        return 0;
-    }
-
 
     //测试数据管理页面
     public function test_data(){
@@ -161,7 +179,12 @@ class ProblemController extends Controller
         return view('admin.problem.test_data',compact('tests'));
     }
 
+    // ajax
     public function upload_data(Request $request){
+        $problem=DB::table('problems')->find($request->input('pid'));  // 提取出要修改的题目
+        if(!$problem || !Auth::user()->privilege('admin') && Auth::id()!=$problem->creator) //不是超级管理员 && 不是出题人 => 禁止上传数据
+            return -1;  // 权限不足直接返回-1
+
         $pid=$request->input('pid');
         $filename=$request->input('filename');
 
@@ -172,14 +195,23 @@ class ProblemController extends Controller
         return 1;
     }
 
+    //ajax
     public function get_data(Request $request){
+        $problem=DB::table('problems')->find($request->input('pid'));  // 提取出要修改的题目
+        if(!$problem || !Auth::user()->privilege('admin') && Auth::id()!=$problem->creator) //不是超级管理员 && 不是出题人 => 禁止查看数据
+            return -1;
         $pid=$request->input('pid');
         $filename=$request->input('filename');
         $data=Storage::get('data/'.$pid.'/test/'.$filename);
         return json_encode($data);
     }
 
+    //form
     public function update_data(Request $request){
+        $problem=DB::table('problems')->find($request->input('pid'));  // 提取出要修改的题目
+        if(!$problem || !Auth::user()->privilege('admin') && Auth::id()!=$problem->creator) //不是超级管理员 && 不是出题人 => 禁止修改本题
+            return view('admin.fail',['msg'=>'您不是该题目的创建者，也不是最高管理员，没有权限修改测试数据!']);
+
         $pid=$request->input('pid');
         $filename=$request->input('filename');
         $content=$request->input('content');
@@ -187,12 +219,17 @@ class ProblemController extends Controller
         return back();
     }
 
+    //ajax
     public function delete_data(Request $request){
+        $problem=DB::table('problems')->find($request->input('pid'));  // 提取出要修改的题目
+        if(!$problem || !Auth::user()->privilege('admin') && Auth::id()!=$problem->creator) //不是超级管理员 && 不是出题人 => 禁止修改本题
+            return -1;
+
         $pid=$request->input('pid');
         $fnames=$request->input('fnames');
         foreach ($fnames as $filename)
             Storage::delete('data/'.$pid.'/test/'.$filename);
-        return back();
+        return 1;
     }
 
 
@@ -260,6 +297,7 @@ class ProblemController extends Controller
                 'spj'         => $node->spj?1:0,
                 'time_limit'  => $node->time_limit * (strtolower($node->time_limit->attributes()->unit)=='s'?1000:1), //本oj用ms
                 'memory_limit'=> $node->memory_limit / (strtolower($node->memory_limit->attributes()->unit)=='kb'?1024:1),
+                'creator'     => Auth::id()
             ];
             //保存图片
             foreach($node->img as $img) {
