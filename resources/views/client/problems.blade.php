@@ -12,6 +12,12 @@
                         <h4 class="pull-left">{{__('main.Problems')}}</h4>
                         <form id="find_form" action="" method="get" class="pull-right form-inline">
                             <input type="number" id="tag_id" name="tag_id" hidden>
+                            <div class="form-inline custom-control custom-checkbox">
+                                <input type="checkbox" name="show_hidden" class="custom-control-input" id="customCheck"
+                                       @if(isset($_GET['show_hidden']))checked @endif
+                                       onchange="this.form.submit()">
+                                <label class="custom-control-label pt-1" for="customCheck">{{__('sentence.show_hidden_problems')}}</label>
+                            </div>
                             <div class="form-inline mx-3">
                                 <select name="perPage" class="form-control px-2" onchange="this.form.submit();">
                                     <option value="20" @if(isset($_GET['perPage'])&&$_GET['perPage']==20)selected @endif>20</option>
@@ -50,7 +56,7 @@
                             @foreach($problems as $item)
                                 <tr>
                                     <td>{{$item->id}}</td>
-                                    @if($item->hidden==0 || Auth::check()&&Auth::user()->privilege('problem'))
+                                    @if($item->hidden==0 || Auth::check()&&Auth::user()->privilege('teacher'))
                                         <td nowrap>
                                             <a href="{{route('problem',$item->id)}}">{{$item->title}}</a>
                                             @if($item->hidden==1)

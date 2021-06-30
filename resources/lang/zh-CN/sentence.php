@@ -9,17 +9,17 @@ return [
     "Permission denied" => "权限不足",
     "Operation failed"  => "操作失败",
 
-    "user_edit_chances" => "你还有 :i 次机会修改你的个人资料!",
 //    auth/register.blade.php
     "Must fill"         => "必填. a-z,A-Z or 0-9",
     "Non essential"     => "非必填",
-    "Not_allow_register" => "管理员关闭了注册功能.",
+    "Not_allow_register"=> "管理员关闭了注册功能.",
 
 //    auth/login.blade.php
     "Forgot Password"   => "忘记密码?",
     "Please login first"=> "请先登录!",
 
 //    user
+    "user_edit_chances" => "你还有 :i 次机会修改你的个人资料!",
     "User not found"    => "用户 :un 不存在!",
     "in_blacklist"      => "由于您的账号已被加入黑名单，无法显示该页面！",
 
@@ -43,6 +43,7 @@ return [
     "tag_marked_zero"   => "请至少添加一个标签!",
     "tag_pool_select"   => "请点击你认为符合本题的标签!",
     "problem_not_found" => "该题目不存在!",
+    "show_hidden_problems" => "显示隐藏的题目",
 
 
 //    contest.password

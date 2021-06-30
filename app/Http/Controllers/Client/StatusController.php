@@ -134,7 +134,7 @@ class StatusController extends Controller
             }
         }else{ //通过题库提交，需要判断一下用户权限
             $hidden=$problem->hidden;
-            if(!Auth::user()->privilege('problem') && $hidden==1) //不是管理员&&问题隐藏 => 不允许提交
+            if(!Auth::user()->privilege('teacher') && $hidden==1) //不是管理员&&问题隐藏 => 不允许提交
                 return view('client.fail',['msg'=>trans('main.Problem').$data['pid'].'：'.trans('main.Hidden')]);
         }
 

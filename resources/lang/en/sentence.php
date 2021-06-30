@@ -9,17 +9,17 @@ return [
     "Permission denied" => "Permission denied",
     "Operation failed"  => "Operation failed",
 
-    "user_edit_chances" => "You have :i more chances to modify your profile!",
 //    auth/register.blade.php
     "Must fill"         => "Must fill, use to login. a-z,A-Z or 0-9",
     "Non essential"     => "Non essential",
-    "Not_allow_register" => "The administrator has turned off the registration function.",
+    "Not_allow_register"=> "The administrator has turned off the registration function.",
 
 //    auth/login.blade.php
     "Forgot Password"   => "Forgot Your Password?",
     "Please login first"=> "Please login first!",
 
 //    user
+    "user_edit_chances" => "You have :i more chances to modify your profile!",
     "User not found"    => "The user :un is not exist!",
     "in_blacklist"      => "You can't open this page because you are in blacklist!",
 
@@ -43,7 +43,7 @@ return [
     "tag_marked_zero"   => "Please add at least 1 tag!",
     "tag_pool_select"   => "Please click several tags that you think the problem should be tagged!",
     "problem_not_found" => "The problem is not exist!",
-
+    "show_hidden_problems" => "Show hidden problems",
 
 //    contest.password
     "pwd wrong"         => "The password is wrong",

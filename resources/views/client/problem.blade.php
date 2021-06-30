@@ -26,7 +26,7 @@
                     <h4 class="text-center">{{isset($contest)?index2ch($problem->index):$problem->id}}
                         . {{$problem->title}}
                         {{--                    管理员编辑题目的连接 --}}
-                        @if(Auth::check()&&Auth::user()->privilege('problem'))
+                        @if(Auth::check()&&Auth::user()->privilege('teacher'))
                             <font style="font-size: 0.85rem">
                                 [ <a href="{{route('admin.problem.update_withId',$problem->id)}}"
                                      target="_blank">{{__('main.Edit')}}</a> ]

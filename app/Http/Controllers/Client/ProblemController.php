@@ -17,7 +17,7 @@ class ProblemController extends Controller
         $problems=$problems->select('problems.id','title','source','hidden',
                 DB::raw("(select count(id) from solutions where problem_id=problems.id) as submit"),
                 DB::raw("(select count(id) from solutions where problem_id=problems.id and result=4) as accepted"))
-            ->when(!Auth::check()||!Auth::user()->privilege('problem'),function ($q){return $q->where('hidden',0);})
+            ->when(!isset($_GET['show_hidden']),function ($q){return $q->where('hidden',0);})
             ->when(isset($_GET['pid'])&&$_GET['pid']!='',function ($q){return $q->where('problems.id',$_GET['pid']);})
             ->when(isset($_GET['title'])&&$_GET['title']!='',function ($q){return $q->where('title','like','%'.$_GET['title'].'%');})
             ->when(isset($_GET['source'])&&$_GET['source']!='',function ($q){return $q->where('source','like','%'.$_GET['source'].'%');})
@@ -69,7 +69,7 @@ class ProblemController extends Controller
             ->where('problem_id',$id)
             ->get();
 
-        if(Auth::check()&&!Auth::user()->privilege('problem_list')&&$problem->hidden) //已登录&&不是管理员&& 问题隐藏
+        if(Auth::check()&&!Auth::user()->privilege('teacher')&&$problem->hidden) //已登录&&不是管理员&& 问题隐藏
         {
             $msg=trans('main.Problem').$id.': '.trans('main.Hidden').'; ';
             if($contests){
