@@ -67,18 +67,16 @@ Ludong University Online Judge
 
 # :hammer: 项目升级
 
-+ 基于Linux Ubuntu安装的用户请执行后两行；
-  基于docker安装的用户请执行全部命令。
++ 最后一条命令最后的参数请填写您的项目所在的**绝对路径**。
 
   ```shell script
-  docker exec -it lduoj /bin/bash
+  docker exec -it lduoj /bin/bash    # 若基于docker安装，请先进入容器
   ```
   ```shell script
-  git clone https://gitee.com/iamwinter/LDUOnlineJudge.git /home/lduoj_upgrade
-  # git clone https://github.com/iamwinter/LDUOnlineJudge.git /home/lduoj_upgrade
-  bash /home/lduoj_upgrade/install/ubuntu16.04/update.sh /home/LDUOnlineJudge
+  git clone https://gitee.com/iamwinter/LDUOnlineJudge.git oj_upgrade
+  # git clone https://github.com/iamwinter/LDUOnlineJudge.git oj_upgrade
+  bash oj_upgrade/install/ubuntu16.04/update.sh /home/LDUOnlineJudge
   ```
-  注：最后一条命令最后的参数是您的项目安装路径。
 
 # :cd: 项目迁移
 
@@ -120,27 +118,26 @@ Ludong University Online Judge
   A. 网页端进入后台首页，即可点击相应按钮启动/重启/停止判题端  
   B. 通过终端命令启动判题端：`bash judge/startup.sh`
 
-+ 判题端配置
-
-  详见`.env`：
++ 判题端配置(文件`.env`)：
   ```shell
   JG_MAX_RUNNING=1              # 并行判题进程数，请根据服务器配置进行修改
   JG_DATA_DIR=storage/app/data  # 测试数据所在目录，请勿修改
   JG_NAME="Master"              # 判题机名称，可修改
   ```
+  注：修改`.env`后，执行`php artisan optimize`生效。
 
-<div align="center">
-
-| 服务器核心数 | 服务器内存 | `JG_MAX_RUNNING`建议值 |
-| --- | --- | --- |
-| ≤2 | ≤1GB | 1 |
-| ≤4 | ≤4GB | 2 |
-| ≤8 | ≤8GB | 4 |
-| ≤16 | ≤16GB | 8 |
-| \>16 | \>16GB | ≥8 |
-
-</div>
-注：修改`.env`后，执行`php artisan optimize`生效。
+    <div align="center">
+    
+    | 服务器核心数 | 服务器内存 | `JG_MAX_RUNNING`建议值 |
+    | --- | --- | --- |
+    | ≤2 | ≤1GB | 1 |
+    | ≤4 | ≤4GB | 2 |
+    | ≤8 | ≤8GB | 4 |
+    | ≤16 | ≤16GB | 8 |
+    | \>16 | \>16GB | ≥8 |
+    
+    </div>
+  
 
 # :page_facing_up: 整体架构
 
@@ -205,7 +202,7 @@ Ludong University Online Judge
     mysql -u${USER} -p${PW} -e"CREATE USER If Not Exists 'ldu'@'%' IDENTIFIED WITH mysql_native_password BY '123456';"
     mysql -u${USER} -p${PW} -e"GRANT all privileges ON lduoj.* TO 'ldu'@'%' identified by '123456';flush privileges;"
     ```
-    然后远程连接【**宿主机ip**:8036】，使用新建的用户lduoj登录mysql即可。
+    然后远程连接【**宿主机ip**:8036】，使用新建的用户ldu登录mysql即可。
 
 方式二：基于本地环境
 1. 下载源码
@@ -231,10 +228,10 @@ Ludong University Online Judge
 
 4. 初始化项目
     ```
-    mkdir -p storage/app/public    # 新建前端静态文件存储目录
-    chmod -R 777 storage bootstrap/cache  # linux必需！
-    composer install --ignore-platform-reqs  # 下载依赖
+    chown www-data:www-data -R storage bootstrap/cache  # linux系统需要赋权
+    composer install --ignore-platform-reqs             # 下载laravel依赖
     
+    mkdir -p storage/app/public # 新建前端静态文件存储目录
     php artisan storage:link    # 将静态文件存储目录软连接到public/storage
     php artisan key:generate    # 必需，生成.env中的APP_KEY
     php artisan optimize        # 必需，加载并优化所有配置信息
@@ -274,7 +271,7 @@ Ludong University Online Judge
 
 | 提出日期 | 开发内容 | 备注 | 完成日期 | 开发者 |
 |---|---|---|---|---|
-|2021.06.25|将中英文切换功能放到主页导航栏，用户自由切换。| | | |
+|2021.06.25|将中英文切换功能放到主页导航栏，用户自由切换。|cookie记住用户选择|2021.06.26|[iamwinter](https://github.com/iamwinter)|
 |2021.06.23|增加【班级/团队】模块，可对班级布置作业；学生可在【我的作业】中查看作业。| | | |
 |2021.06.23|后台权限需要整顿；每个题目/竞赛，应当保存创建人，只有创建人可修改。| | | |
 |2021.06.23|新增竞赛类别；管理员可以自由管理竞赛的类别，含二级分类。| | | |
