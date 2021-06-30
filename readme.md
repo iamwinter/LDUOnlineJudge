@@ -41,10 +41,10 @@ Ludong University Online Judge
   # git clone https://github.com/iamwinter/LDUOnlineJudge.git
   bash LDUOnlineJudge/install/ubuntu16.04/install.sh
   ```
-    - 浏览器访问服务器ip进入首页。
-    - **注册用户admin自动成为管理员**。
-    - mysql数据库名lduoj，默认用户lduoj@localhost(密码123456789)。
-    - nginx配置文件`/etc/nginx/conf.d/lduoj.conf`。
+  - 浏览器访问服务器ip进入首页。
+  - **注册用户admin自动成为管理员**。
+  - mysql数据库名lduoj，默认用户lduoj@localhost(密码123456789)。
+  - nginx配置文件`/etc/nginx/conf.d/lduoj.conf`。
 
 
 + **基于docker（推荐）**
@@ -58,12 +58,12 @@ Ludong University Online Judge
       iamwinter/lduoj:latest
   ```
 
-    - `-p`指定`8080`为主机端口，可自定义。
-      浏览器访问`服务器ip:8080`进入首页。
-      [配置域名与端口](https://blog.csdn.net/winter2121/article/details/107783085)
-    - `-v`指定`~/lduoj_docker`为保存数据的宿主机目录，可自定义。
-      如需备份系统，只需将此文件夹打包备份。
-    - 进入容器进行管理： `docker exec -it lduoj /bin/bash`
+  - `-p`指定`8080`为主机端口，可自定义。
+    浏览器访问`服务器ip:8080`进入首页。
+    [配置域名与端口](https://blog.csdn.net/winter2121/article/details/107783085)
+  - `-v`指定`~/lduoj_docker`为保存数据的宿主机目录，可自定义。
+    如需备份系统，只需将此文件夹打包备份。
+  - 进入容器进行管理： `docker exec -it lduoj /bin/bash`
 
 # :hammer: 项目升级
 
@@ -94,22 +94,18 @@ Ludong University Online Judge
 
 + 基于docker
 
-  1.在**原主机**将文件夹`~/lduoj_docker`（或docker容器内`/volume`）打包，发送到**新主机**相同位置。
-
-    - 原主机 [ 进入容器 -> 打包压缩 -> 发送到新主机(用户名`root`；ssh端口号`22`；实际ip`ip`) ]：
+  1.在**原主机**将文件夹`~/lduoj_docker`（或docker容器内`/volume`）打包，发送到**新主机**
   ```shell
-  docker exec -it lduoj /bin/bash
-  tar -zcvf volume.tar.gz /volume
-  scp -P 22 volume.tar.gz root@ip:~/
+  docker exec -it lduoj /bin/bash     # 进入容器
+  tar -zcvf volume.tar.gz /volume     # 打包
+  scp -P 22 volume.tar.gz root@ip:~/  # 发送到新主机`~/`下
   ```
-    - 新主机 [ 解压 -> 重命名 ]：
+  2.在新主机解压收到的压缩文件
   ```shell
-  cd ~/
-  tar -zxvf volume.tar.gz
-  mv volume lduoj_docker
+  tar -zxvf volume.tar.gz   # 解压
+  mv volume lduoj_docker    # 重命名，可自定义
   ```
-
-  2.在**新主机**基于docker安装(见[项目安装](#项目安装))。
+  3.在新主机基于docker安装(见[项目安装](#项目安装))。
 
 # :mega: 判题端使用说明
 
@@ -126,36 +122,36 @@ Ludong University Online Judge
   ```
   注：修改`.env`后，执行`php artisan optimize`生效。
 
-    <div align="center">
-    
-    | 服务器核心数 | 服务器内存 | `JG_MAX_RUNNING`建议值 |
-    | --- | --- | --- |
-    | ≤2 | ≤1GB | 1 |
-    | ≤4 | ≤4GB | 2 |
-    | ≤8 | ≤8GB | 4 |
-    | ≤16 | ≤16GB | 8 |
-    | \>16 | \>16GB | ≥8 |
-    
-    </div>
+  <div align="center">
+  
+  | 服务器核心数 | 服务器内存 | `JG_MAX_RUNNING`建议值 |
+  | --- | --- | --- |
+  | ≤2 | ≤1GB | 1 |
+  | ≤4 | ≤4GB | 2 |
+  | ≤8 | ≤8GB | 4 |
+  | ≤16 | ≤16GB | 8 |
+  | \>16 | \>16GB | ≥8 |
+  
+  </div>
   
 
 # :page_facing_up: 整体架构
 
 + 主要文件
 
-    - `routes/web.php`：路由转发文件，定义了全站路由。
-    - `config/oj/`：含本OJ自定义的配置文件。
-    - `app/Http/`：后端控制器`Controllers`、中间件`Middleware`等程序。
-    - `resources/views/`：前端html代码。
-    - `resources/lang/`：网页文字语言文件。
-    - `public/`：网页访问入口`index.php`，js、css文件和web插件。
-    - `storage/app/`：保存题目数据、文件等。
-    - `storage/app/public/`：保存静态文件(如图片)等。
-      软连接到`public/storage`供网页访问。
-    - `judge/`：判题程序，与laravel框架无关。
-    - `install/`：用于安装本OJ，与laravel框架无关。
-    - `.env.example`：配置文件，含数据库连接信息、判题设置等。
-      复制为`.env`生效。
+  - `routes/web.php`：路由转发文件，定义了全站路由。
+  - `config/oj/`：含本OJ自定义的配置文件。
+  - `app/Http/`：后端控制器`Controllers`、中间件`Middleware`等程序。
+  - `resources/views/`：前端html代码。
+  - `resources/lang/`：网页文字语言文件。
+  - `public/`：网页访问入口`index.php`，js、css文件和web插件。
+  - `storage/app/`：保存题目数据、文件等。
+  - `storage/app/public/`：保存静态文件(如图片)等。
+    软连接到`public/storage`供网页访问。
+  - `judge/`：判题程序，与laravel框架无关。
+  - `install/`：用于安装本OJ，与laravel框架无关。
+  - `.env.example`：配置文件，含数据库连接信息、判题设置等。
+    复制为`.env`生效。
 
 + 工作原理
 
@@ -165,7 +161,7 @@ Ludong University Online Judge
 
   判题机启动时，轮询程序(`judge/cpp/polling.cpp`)将不停查询数据库，
   收集未判的提交记录（提交编号），
-  然后开启子进程(`judge/cpp/judge.cpp`)判题（最多并行5个）。
+  然后开启子进程(`judge/cpp/judge.cpp`)判题（并行）。
   对于每一个判题进程，主要步骤是：从数据库读取代码、编译、输入数据运行、
   输出结果与正确结果对比（或者特判）、将判题结论写入数据库。
 
@@ -265,7 +261,7 @@ Ludong University Online Judge
   docker push iamwinter/lduoj:latest
   ```
 
-# 开发日志
+# :memo: 开发日志
 
 <div align="center">
 
@@ -288,7 +284,7 @@ Ludong University Online Judge
 
 </div>
 
-# 严重bug修复
+# :bug: 严重bug修复
 
 <div align="center">
 
