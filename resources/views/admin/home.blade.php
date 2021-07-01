@@ -52,10 +52,10 @@
         </div>
 
         <div class="my-container bg-white">
-            <h4>服务器内存使用情况（单位：GB）</h4>
+            <h4>服务器内存使用情况（单位：MB）</h4>
             <hr>
             <div class="overflow-auto px-2">
-                <pre>@php(system('free -g'))</pre>
+                <pre>@php(system('free -m'))</pre>
             </div>
             <hr>
         </div>

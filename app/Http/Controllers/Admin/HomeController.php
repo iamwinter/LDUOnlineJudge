@@ -25,9 +25,9 @@ class HomeController extends Controller
 
         //服务器相关信息
         $systemInfo = [
-            '服务器主机名'    =>$_SERVER["HTTP_HOST"],
+            '网站域名'      =>$_SERVER["HTTP_HOST"],
+            '服务器主机名'   =>  $_SERVER['SERVER_NAME'],
             '服务器IP地址'   =>  $_SERVER['SERVER_ADDR'],
-            '服务器域名'     =>  $_SERVER['SERVER_NAME'],
             '服务器Web端口'  =>  $_SERVER['SERVER_PORT'],
             '服务器操作系统'  =>  php_uname(),
             '服务器当前时间'  => date("Y-m-d H:i:s"),
