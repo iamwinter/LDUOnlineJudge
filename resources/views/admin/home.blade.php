@@ -43,7 +43,7 @@
                 <div class="form-inline">
                     <label>并行判题数：
                         <input type="number" name="JG_MAX_RUNNING" value="{{session('JG_MAX_RUNNING')??config('app.JG_MAX_RUNNING')}}" required class="form-control">
-                        （建议值：服务器可用内存(available)/2；该值过大会导致服务器卡顿甚至宕机）
+                        （建议值：可用内存(available MB)/2048; 该值过大会导致服务器卡顿甚至宕机）
                     </label>
                 </div>
                 <button class="btn pull-right text-white mt-4 bg-success">保存</button>
