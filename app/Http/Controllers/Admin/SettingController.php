@@ -55,7 +55,7 @@ class SettingController extends Controller
 
                 DB::table('settings')->updateOrInsert(['key'=>$key],['value'=>$val]);
             }
-            system('sudo php '.base_path('artisan').' optimize',$out);
+            system('php '.base_path('artisan').' optimize',$out);
             return "OK";
         }
     }

@@ -116,24 +116,11 @@ Ludong University Online Judge
 
 + 判题端配置(文件`.env`)：
   ```shell
-  JG_MAX_RUNNING=1              # 并行判题进程数，请根据服务器配置进行修改
-  JG_DATA_DIR=storage/app/data  # 测试数据所在目录，请勿修改
+  JG_DATA_DIR=storage/app/data  # 测试数据所在目录，**请勿修改!**
   JG_NAME="Master"              # 判题机名称，可修改
+  JG_MAX_RUNNING=1              # 并行判题进程数，建议值为可用内存(GB)/2
   ```
   注：修改`.env`后，执行`php artisan optimize`生效。
-
-  <div align="center">
-  
-  | 服务器核心数 | 服务器内存 | `JG_MAX_RUNNING`建议值 |
-  | --- | --- | --- |
-  | ≤2 | ≤1GB | 1 |
-  | ≤4 | ≤4GB | 2 |
-  | ≤8 | ≤8GB | 4 |
-  | ≤16 | ≤16GB | 8 |
-  | \>16 | \>16GB | ≥8 |
-  
-  </div>
-  
 
 # :page_facing_up: 整体架构
 

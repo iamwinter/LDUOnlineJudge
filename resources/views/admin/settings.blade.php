@@ -7,7 +7,7 @@
     <h2>设置</h2>
     <hr>
     <div class="container">
-        <div class="my-container">
+        <div class="my-container bg-white">
             <form onsubmit="return submit_settings(this)" method="post">
                 @csrf
                 <div class="input-group">
@@ -34,7 +34,7 @@
                 <button class="btn text-white mt-4 bg-success">保存</button>
             </form>
         </div>
-        <div class="my-container">
+        <div class="my-container bg-white">
             <form id="form_switch" onsubmit="return submit_settings(this)" method="post">
                 <link href="{{asset('static/switch-dist/switch.css')}}" rel="stylesheet"/>
                 <script src="{{asset('static/switch-dist/switch.js')}}"></script>
@@ -123,7 +123,7 @@
                 </script>
             </form>
         </div>
-        <div class="my-container">
+        <div class="my-container bg-white">
             <form onsubmit="return submit_settings(this)" method="post">
                 @csrf
                 <div class="form-inline">
