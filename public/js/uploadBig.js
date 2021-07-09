@@ -15,7 +15,7 @@ function uploadBig(obj) {
         var formData = new FormData();
         formData.append('filename',args.files[index].name);     //文件原始名
         formData.append('block_id',Math.round(start/args.blockSize));  //块号
-        formData.append('block_tot',Math.ceil(args.files[index].size/args.blockSize));//块数
+        formData.append('block_tot',Math.max(1,Math.ceil(args.files[index].size)/args.blockSize));//块数
         formData.append('block',args.files[index].slice(start,start+args.blockSize)); //文件块
         if(args.data!==undefined && start+args.blockSize>=args.files[index].size)//要上传最后一块了
         {
@@ -30,8 +30,7 @@ function uploadBig(obj) {
             processData: false,
             contentType: false,
             success:function(ret){
-                // 只有ret返回0，才代表文件需要继续上传
-                if(ret!==0 || index===args.files.length-1 && start+args.blockSize>=args.files[index].size)//最后一个上传完毕
+                if(index===args.files.length-1 && start+args.blockSize>=args.files[index].size)//最后一个上传完毕
                 {
                     //上传成功...回调函数[文件总数，控制器返回值]
                     if(args.success!==undefined)

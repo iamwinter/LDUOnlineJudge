@@ -11,7 +11,9 @@
                 <label>题号：</label>
                 <input type="number" step="1" name="pid" value="{{isset($_GET['pid'])?$_GET['pid']:''}}" required class="form-control ml-3">
                 <button class="btn btn-light bg-success mx-1">查看数据</button>
-        <a href="{{route('problem',$_GET['pid'])}}" type="button" target="_blank" class="btn btn-light bg-success mx-1">查看题目</a>
+                @if(isset($_GET['pid']))
+                    <a href="{{route('problem',$_GET['pid'])}}" type="button" target="_blank" class="btn btn-light bg-success mx-1">查看题目</a>
+                @endif
             </div>
         </form>
         @if(isset($_GET['pid']))
@@ -124,10 +126,9 @@
         </div>
     </div>
 
-    <script src="{{asset('js/uploadBig.js')}}?v=2"></script>
+    <script src="{{asset('js/uploadBig.js')}}?v=07.09"></script>
     <script>
         function do_upload() {
-            alert($("#test_data")[0].files.length)
             uploadBig({
                 url:"{{route('admin.problem.upload_data')}}",
                 _token:"{{csrf_token()}}",
