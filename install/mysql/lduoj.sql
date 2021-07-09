@@ -276,13 +276,13 @@ CREATE TABLE `group_contests`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `contest_id` int(11) NOT NULL COMMENT '比赛ID',
   `group_id` int(11) NOT NULL COMMENT '班级ID',
-  `order` int(11) NOT NULL DEFAULT 0 COMMENT '排序 contest排序',
+  `order` int(11) NOT NULL DEFAULT 0 COMMENT 'contest顺序',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间 默认为当前时间',
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改日期 默认为当前时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `cid`(`contest_id`) USING BTREE,
   INDEX `gid`(`group_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Fixed;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = FIXED;
 
 -- ----------------------------
 -- Table structure for group_users
@@ -298,27 +298,26 @@ CREATE TABLE `group_users`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `gid`(`group_id`) USING BTREE,
   INDEX `uid`(`user_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Fixed;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = FIXED;
 
 -- ----------------------------
 -- Table structure for groups
 -- ----------------------------
 DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '班级名称 e.g 算法设计',
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '注释说明',
-  `creator` int(11) NOT NULL COMMENT '创建人编号 当前用户ID',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建日期 默认为当前时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改日期 默认为当前日期',
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'group名称 e.g. 新生训练组',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `teacher` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '教师姓名',
-  `hidden` tinyint(4) NULL DEFAULT 0 COMMENT '锁定状态 是否隐藏',
-  `grade` int(11) NULL DEFAULT NULL COMMENT '年级 整数e.g.2016',
+  `grade` int(11) NULL DEFAULT NULL COMMENT '年级/入学年份 e.g. 2016',
   `major` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '专业名称 e.g 软件工程',
   `class` int(11) NULL DEFAULT NULL COMMENT '班级编号 e.g 01',
+  `hidden` tinyint(4) NULL DEFAULT 0 COMMENT '是否隐藏',
+  `creator` int(11) NOT NULL COMMENT '创建人user ID',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建日期 默认为当前时间',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改日期 默认为当前日期',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `IDX_groups_creator`(`creator`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '班级/团队' ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
