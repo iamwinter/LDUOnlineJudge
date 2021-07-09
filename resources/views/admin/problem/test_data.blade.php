@@ -10,21 +10,28 @@
                 <h2 class="mr-3">测试数据</h2>
                 <label>题号：</label>
                 <input type="number" step="1" name="pid" value="{{isset($_GET['pid'])?$_GET['pid']:''}}" required class="form-control ml-3">
-                <button class="btn btn-light bg-success ml-1">转到</button>
+                <button class="btn btn-light bg-success mx-1">查看数据</button>
+        <a href="{{route('problem',$_GET['pid'])}}" type="button" target="_blank" class="btn btn-light bg-success mx-1">查看题目</a>
             </div>
         </form>
         @if(isset($_GET['pid']))
             <form class="p-3" method="post" enctype="multipart/form-data" onsubmit="return do_upload()">
                 @csrf
                 <div class="form-inline">
-                    <label>上传文件(按住Ctrl多选)：</label>
+                    <label>上传文件：</label>
                     <input type="file" id="test_data" required multiple class="form-control">
-                    <button class="btn btn-light bg-success ml-1">上传</button>
+                    <button class="btn btn-light bg-success ml-1">上传文件</button>
                 </div>
             </form>
         @endif
     </div>
 
+    <div class="alert alert-info">
+        1. 上传文件可以按住ctrl单击多选，或按住shift区间多选。<br>
+        2. 测试数据输入与输出<strong>必须成对出现</strong>且文件名相同；
+        输入后缀为<strong>.in</strong>，输出后缀为<strong>.out</strong>或<strong>.ans</strong>。
+        例如【test.in与test.out】、【1.in与1.ans】都是合法的测试数据。
+    </div>
     <div>
         @if(isset($_GET['pid']))
             <div class="table-responsive px-4">
@@ -120,6 +127,7 @@
     <script src="{{asset('js/uploadBig.js')}}?v=2"></script>
     <script>
         function do_upload() {
+            alert($("#test_data")[0].files.length)
             uploadBig({
                 url:"{{route('admin.problem.upload_data')}}",
                 _token:"{{csrf_token()}}",

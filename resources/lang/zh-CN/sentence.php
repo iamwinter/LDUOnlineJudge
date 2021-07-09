@@ -44,6 +44,7 @@ return [
     "tag_pool_select"   => "请点击你认为符合本题的标签!",
     "problem_not_found" => "该题目不存在!",
     "show_hidden_problems" => "显示隐藏的题目",
+    "empty_code"        => "请选择上传文件或输入代码",
 
 
 //    contest.password

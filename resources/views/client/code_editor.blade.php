@@ -180,8 +180,8 @@
 
         //监听表单提交
         $("#code_form").submit(function (){
-            if(code_editor.getValue().length<3){
-                alert('代码长度过短！')
+            if($("input[name='code_file']").val()==="" && code_editor.getValue().length<3){
+                Notiflix.Report.Info('{{trans('sentence.Operation failed')}}','{{trans('sentence.empty_code')}}!','OK')
                 return false
             }
         })

@@ -107,7 +107,7 @@ class StatusController extends Controller
     public function create(Request $request)
     {
         //拦截非管理员的频繁提交
-        if(!Auth::user()->privilege('admin')){
+        if(!Auth::user()->privilege('teacher')){
             $last_submit_time = DB::table('solutions')
                 ->where('user_id',Auth::id())
                 ->orderByDesc('submit_time')
@@ -124,7 +124,7 @@ class StatusController extends Controller
         if(isset($data['cid'])){
             $contest=DB::table("contests")->select('judge_instantly','judge_type','allow_lang','end_time')->find($data['cid']);
             if( !( (1<<$data['language'])&$contest->allow_lang ) )//使用了不允许的代码语言
-                return view('client.fail',['msg'=>'A not allowed language!']);
+                return view('client.fail',['msg'=>'Using a programming language that is not allowed!']);
             if($contest->judge_instantly==0&&time()<strtotime($contest->end_time)){ //赛后判题，之前的提交都作废=>Skipped
                 DB::table('solutions')->where('contest_id',$data['cid'])
                     ->where('problem_id',$data['pid'])
@@ -147,6 +147,10 @@ class StatusController extends Controller
                 $data['code'] = preg_replace("/\?\?/",$ans,$data['code'],1);
             }
         }
+
+        if(strlen($data['code'])<3)
+            return view('client.fail',['msg'=>'代码长度过程！']);
+
         DB::table('solutions')->insert([
             'problem_id'    => $data['pid'],
             'contest_id'    => isset($data['cid'])?$data['cid']:-1,
@@ -162,7 +166,7 @@ class StatusController extends Controller
             'code'          => $data['code']
             ]);
 
-        Cookie::queue('submit_language',$data['language']);
+        Cookie::queue('submit_language',$data['language']);//Cookie记住用户使用的语言，以后提交默认该语言
         if(isset($contest)) //竞赛提交
             return redirect(route('contest.status',[$data['cid'],'index'=>$data['index'],'username'=>Auth::user()->username]));
 

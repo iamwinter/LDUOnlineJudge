@@ -44,6 +44,7 @@ return [
     "tag_pool_select"   => "Please click several tags that you think the problem should be tagged!",
     "problem_not_found" => "The problem is not exist!",
     "show_hidden_problems" => "Show hidden problems",
+    "empty_code"        => "Choose a file or input code, Please",
 
 //    contest.password
     "pwd wrong"         => "The password is wrong",

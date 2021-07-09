@@ -167,6 +167,8 @@ class ProblemController extends Controller
         //读取数据文件
         $tests=[];
         if(isset($_GET['pid'])){
+            if(!DB::table('problems')->where('id',$_GET['pid'])->exists())
+                return view('admin.fail',['msg'=>'题目'.$_GET['pid'].'不存在']);
             foreach (Storage::allFiles('data/'.$_GET['pid'].'/test') as $filepath){
                 $name=pathinfo($filepath,PATHINFO_FILENAME);  //文件名
                 $ext=pathinfo($filepath,PATHINFO_EXTENSION);    //拓展名
@@ -182,6 +184,8 @@ class ProblemController extends Controller
     // ajax
     public function upload_data(Request $request){
         $problem=DB::table('problems')->find($request->input('pid'));  // 提取出要修改的题目
+        if(!$problem)
+            return -2;  // 题目不存在返回-2
         if(!$problem || !Auth::user()->privilege('admin') && Auth::id()!=$problem->creator) //不是超级管理员 && 不是出题人 => 禁止上传数据
             return -1;  // 权限不足直接返回-1
 

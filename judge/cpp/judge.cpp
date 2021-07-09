@@ -206,6 +206,8 @@ char* get_data_out_path(const char* data_dir,const char* test_name) //获取测�
 {
     char *path = new char[256];
     sprintf(path,"%s/%s.out",data_dir,test_name);
+    if(access(path,F_OK)==-1)
+        sprintf(path,"%s/%s.ans",data_dir,test_name);
     return path;
 }
 
