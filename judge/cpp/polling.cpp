@@ -60,7 +60,7 @@ void get_wating_solution(int solution_queue[],int &queueing_cnt) //从solutions�
     mysql_free_result(mysql_res); //必须释放结果集，因为它是malloc申请在堆里的内存
     if(queueing_cnt>0)  //更新已读入的solution的result=queueing
     {
-        printf("It's gonna judge following %d sid: (%s)\n",queueing_cnt,sid_str);
+        printf("Judger named [%s] is gonna judge following %d sid: (%s)\n",JG_NAME,queueing_cnt,sid_str);
         sprintf(sql,"UPDATE solutions SET result=%d,judger='%s' WHERE id in (%s)",OJ_QI,JG_NAME,sid_str); //更新状态
         mysql_real_query(mysql,sql,strlen(sql));
     }
@@ -133,6 +133,7 @@ int main (int argc, char* argv[])
     JG_NAME=argv[8];
 
     mysql = mysql_init(NULL);   //初始化数据库连接变量
+    mysql_options(mysql,MYSQL_SET_CHARSET_NAME,"utf8mb4");//判题机名称可能有中文，故设置utf8mb4
     mysql = mysql_real_connect(mysql,db_host,db_user,db_pass,db_name,atoi(db_port),NULL,0);
     if(!mysql){
         printf("Polling Error: Can't connect to database!\n");

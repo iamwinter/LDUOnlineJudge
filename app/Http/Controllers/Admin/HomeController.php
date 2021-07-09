@@ -55,13 +55,13 @@ class HomeController extends Controller
 
     public function modify_env(Request $request){
         if($request->has('JG_NAME')){
-            exec("sudo sed -i 's/^JG_NAME.*$/JG_NAME=\"".$request->get('JG_NAME')."\"/' ".app()->environmentFilePath(),$out,$status);
+            exec("sudo sed -i 's/^JG_NAME.*$/JG_NAME=\"".addslashes(addslashes($request->get('JG_NAME')))."\"/' ".app()->environmentFilePath(),$out,$status);
         }
         if($request->has('JG_MAX_RUNNING')){
             exec("sudo sed -i 's/^JG_MAX_RUNNING.*$/JG_MAX_RUNNING=".$request->get('JG_MAX_RUNNING')."/' ".app()->environmentFilePath(),$out,$status);
         }
         exec('php '.base_path('artisan').' optimize',$out,$status);
-
+        exec('sudo bash '.base_path('judge/startup.sh'),$out,$status);
         //由于重新缓存的配置并不会立刻生效，需要将值返回前台，让用户看到修改成功的值
         return redirect(route('admin.home'))
             ->with('ret',implode('<br>',$out))

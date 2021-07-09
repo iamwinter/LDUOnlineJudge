@@ -28,7 +28,7 @@
 
     <div class="alert alert-info">
         1. 上传文件可以按住ctrl单击多选，或按住shift区间多选。<br>
-        2. 测试数据输入与输出<strong>必须成对出现</strong>且文件名相同；
+        2. 测试数据输入与输出<strong>必须成对出现</strong>且文件名必须只含英文符号或数字；
         输入后缀为<strong>.in</strong>，输出后缀为<strong>.out</strong>或<strong>.ans</strong>。
         例如【test.in与test.out】、【1.in与1.ans】都是合法的测试数据。
     </div>
